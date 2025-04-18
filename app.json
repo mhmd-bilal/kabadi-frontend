@@ -1,0 +1,61 @@
+{
+  "expo": {
+    "name": "kabbadi",
+    "slug": "kabbadi",
+    "version": "1.0.0",
+    "scheme": "kabbadi",
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-dev-launcher",
+        {
+          "launchMode": "most-recent"
+        }
+      ]
+    ],
+    "fonts": [
+      "./assets/fonts/Montserrat-Regular.ttf",
+      "./assets/fonts/Montserrat-Medium.ttf",
+      "./assets/fonts/Montserrat-SemiBold.ttf",
+      "./assets/fonts/Montserrat-Bold.ttf"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "tsconfigPaths": true
+    },
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.peram.rides.kabbadi"
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "6ac433ed-9ca5-46b2-acdd-976a63340bda"
+      }
+    }
+  }
+}
