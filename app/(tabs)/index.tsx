@@ -50,7 +50,7 @@ export default function HomePage() {
   return (
     <View className="h-full w-full bg-[#f7f2f1]">
       <Stack.Screen options={{ headerShown: false }} />
-      <View className="mb-4 mt-6 h-60 flex-row items-center justify-start bg-[#f7f2f1]">
+      <View className="mb-4 mt-0 h-60 flex-row items-center justify-start bg-[#f7f2f1]">
         <ImageBackground
           source={require('../../assets/highlight.jpg')}
           className="h-full w-full"
