@@ -1,7 +1,7 @@
 import { Stack } from 'expo-router';
 import { View, Text, FlatList, TouchableOpacity, TextInput, Modal, ScrollView } from 'react-native';
 import { useState, useEffect } from 'react';
-import storageHelper, { Team, Player } from '../storageHelper'; // Import from storageHelper
+import storageHelper, { Team, Player } from './storageHelper'; // Import from storageHelper
 
 export default function TeamsPage() {
   const [teams, setTeams] = useState<Team[]>([]);
@@ -15,7 +15,6 @@ export default function TeamsPage() {
   const [newPlayerName, setNewPlayerName] = useState('');
   const [newPlayerNumber, setNewPlayerNumber] = useState('');
 
-  // Load teams on component mount
   useEffect(() => {
     loadTeams();
   }, []);

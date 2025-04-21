@@ -16,6 +16,9 @@
         {
           "launchMode": "most-recent"
         }
+      ],
+      [
+        "@react-native-google-signin/google-signin"
       ]
     ],
     "fonts": [
@@ -48,7 +51,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.peram.rides.kabbadi"
+      "package": "com.ghilli.app"
     },
     "extra": {
       "router": {

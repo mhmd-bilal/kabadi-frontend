@@ -1,7 +1,7 @@
 import Feather from '@expo/vector-icons/Feather';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useState } from 'react';
-import { Stack } from 'expo-router';
+import { Stack, router } from 'expo-router';
 import {
   View,
   Text,
@@ -10,12 +10,14 @@ import {
   ScrollView,
   ImageBackground,
   StyleSheet,
+  TouchableOpacity,
 } from 'react-native';
-import storageHelper, { Team, Match } from '../storageHelper'; // Import from storageHelper
+import storageHelper, { Team, Match, Ground } from '../storageHelper'; // Import from storageHelper
 
 export default function HomePage() {
   const [teams, setTeams] = useState<Team[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
+  const [grounds, setGrounds] = useState<Ground[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -43,8 +45,11 @@ export default function HomePage() {
     setLoading(true);
     const loadedTeams = await storageHelper.getTeams();
     const loadedMatches = await storageHelper.getMatches();
+    const loadedGrounds = await storageHelper.getGrounds();
+    
     setTeams(loadedTeams);
     setMatches(loadedMatches);
+    setGrounds(loadedGrounds);
     setLoading(false);
   };
   return (
@@ -88,55 +93,59 @@ export default function HomePage() {
               const awayTeam = teams.find((team) => team.id === match.awayTeamId);
 
               return (
-                <View
+                <TouchableOpacity
                   key={match.id}
-                  className="relative mb-4 mr-2 min-w-64 rounded-md border border-gray-200 bg-white p-4 pb-10 shadow-md">
-                  {/* Teams and Scores */}
-                  <View className="flex-row items-center justify-between">
-                    {/* Home Team */}
-                    <View className="items-start">
-                      <Text className="font-regular text-base text-black">
-                        {homeTeam ? homeTeam.name : match.homeTeamId}
-                      </Text>
-                      <Text className="font-regular text-3xl text-black">
-                        {match.result ? match.result.homeScore : ''}
-                      </Text>
+                  onPress={() => router.push({pathname: '/match/[id]', params: {id: match.id}})}
+                  activeOpacity={0.7}>
+                  <View
+                    className="relative mb-4 mr-2 min-w-64 rounded-md border border-gray-200 bg-white p-4 pb-10 shadow-md">
+                    {/* Teams and Scores */}
+                    <View className="flex-row items-center justify-between">
+                      {/* Home Team */}
+                      <View className="items-start">
+                        <Text className="font-regular text-base text-black">
+                          {homeTeam ? homeTeam.name : match.homeTeamId}
+                        </Text>
+                        <Text className="font-regular text-3xl text-black">
+                          {match.result ? match.result.homeScore : 'vs'}
+                        </Text>
+                      </View>
+
+                      {/* VS divider */}
+                      <Text className="font-regular text-lg text-gray-500">{match.result ? 'vs' : ''}</Text>
+
+                      {/* Away Team */}
+                      <View className="items-end">
+                        <Text className="font-regular text-base text-black">
+                          {awayTeam ? awayTeam.name : match.awayTeamId}
+                        </Text>
+                        <Text className="font-regular text-3xl text-black">
+                          {match.result ? match.result.awayScore : ''}
+                        </Text>
+                      </View>
                     </View>
+                    {/* Status pill */}
+                    <View className="absolute bottom-2 right-2 flex-row items-center">
+                      {/* Line */}
+                      <View
+                        className={`h-0.5 w-10 rounded-full ${
+                          match.status === 'in-progress' ? 'bg-[#aa1d16]' : 'bg-[#16aa3e]'
+                        }`}
+                      />
 
-                    {/* VS divider */}
-                    <Text className="font-regular text-lg text-gray-500">vs</Text>
+                      {/* Spacer */}
+                      <View className="w-2" />
 
-                    {/* Away Team */}
-                    <View className="items-end">
-                      <Text className="font-regular text-base text-black">
-                        {awayTeam ? awayTeam.name : match.awayTeamId}
-                      </Text>
-                      <Text className="font-regular text-3xl text-black">
-                        {match.result ? match.result.awayScore : ''}
+                      {/* Status Text */}
+                      <Text
+                        className={`font-semibold text-xs ${
+                          match.status === 'in-progress' ? 'text-[#aa1d16]' : 'text-[#16aa3e]'
+                        }`}>
+                        {match.status === 'in-progress' ? 'LIVE' : match.status.toUpperCase()}
                       </Text>
                     </View>
                   </View>
-                  {/* Status pill */}
-                  <View className="absolute bottom-2 right-2 flex-row items-center">
-                    {/* Line */}
-                    <View
-                      className={`h-0.5 w-10 rounded-full ${
-                        match.status === 'in-progress' ? 'bg-[#aa1d16]' : 'bg-[#16aa3e]'
-                      }`}
-                    />
-
-                    {/* Spacer */}
-                    <View className="w-2" />
-
-                    {/* Status Text */}
-                    <Text
-                      className={`font-semibold text-xs ${
-                        match.status === 'in-progress' ? 'text-[#aa1d16]' : 'text-[#16aa3e]'
-                      }`}>
-                      {match.status === 'in-progress' ? 'LIVE' : match.status.toUpperCase()}
-                    </Text>
-                  </View>
-                </View>
+                </TouchableOpacity>
               );
             })}
           </ScrollView>
@@ -148,27 +157,37 @@ export default function HomePage() {
             className="flex flex-row gap-4 overflow-visible bg-transparent"
             horizontal
             showsHorizontalScrollIndicator={false}>
-            {dummyGrounds.map((ground) => (
-              <View
+            {grounds.map((ground) => (
+              <TouchableOpacity
                 key={ground.id}
-                className="relative mb-4 mr-2 w-64 overflow-hidden rounded-md border border-gray-200 bg-white shadow-lg">
-                {/* Ground Image */}
-                <Image source={{ uri: ground.image }} className="h-32 w-full" resizeMode="cover" />
-
-                {/* Status Badge */}
+                onPress={() => router.push({pathname: '/ground/[id]', params: {id: ground.id}})}
+                activeOpacity={0.7}>
                 <View
-                  className={`absolute right-2 top-2 rounded-full px-3 py-1 ${
-                    ground.status === 'open' ? 'bg-[#16aa3e]' : 'bg-[#aa1d16]'
-                  }`}>
-                  <Text className="font-regular text-xs uppercase text-white">{ground.status}</Text>
-                </View>
+                  className="relative mb-4 mr-2 w-64 overflow-hidden rounded-md border border-gray-200 bg-white shadow-lg">
+                  {/* Ground Image */}
+                  <Image 
+                    source={{ uri: ground.photos[0] }} 
+                    className="h-32 w-full" 
+                    resizeMode="cover" 
+                  />
 
-                {/* Info Section */}
-                <View className="p-3">
-                  <Text className="font-semibold text-lg text-black">{ground.name}</Text>
-                  <Text className="font-regular text-sm text-gray-500">{ground.location}</Text>
+                  {/* Status Badge */}
+                  <View
+                    className={`absolute right-2 top-2 rounded-full px-3 py-1 ${
+                      ground.status === 'open' ? 'bg-[#16aa3e]' : 
+                      ground.status === 'closed' ? 'bg-[#aa1d16]' : 
+                      'bg-[#aa9416]'
+                    }`}>
+                    <Text className="font-regular text-xs uppercase text-white">{ground.status}</Text>
+                  </View>
+
+                  {/* Info Section */}
+                  <View className="p-3">
+                    <Text className="font-semibold text-lg text-black">{ground.name}</Text>
+                    <Text className="font-regular text-sm text-gray-500">{ground.location}</Text>
+                  </View>
                 </View>
-              </View>
+              </TouchableOpacity>
             ))}
           </ScrollView>
         </View>

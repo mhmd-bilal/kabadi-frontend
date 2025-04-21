@@ -13,7 +13,7 @@ import {
   Alert,
 } from 'react-native';
 
-import storageHelper, { Match, Team } from '../storageHelper'; // Import from storageHelper
+import storageHelper, { Match, Team } from './storageHelper'; // Import from storageHelper
 import { Feather } from '@expo/vector-icons';
 
 // Helper function to format date and time
@@ -272,7 +272,7 @@ export default function MatchesPage() {
               className={`border-b-2 px-3 pb-2 ${
                 statusFilter === status ? 'border-[#16aa3e]' : 'border-transparent'
               }`}
-              onPress={() => setStatusFilter(status)}>
+              onPress={() => setStatusFilter(status as any)}>
               <Text
                 className={`font-regular text-sm ${
                   statusFilter === status ? 'text-[#16aa3e]' : 'text-gray-400'

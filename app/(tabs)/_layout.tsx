@@ -34,15 +34,15 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="matches"
+        name="myspace"
         options={{
-          title: 'Matches',
+          title: 'My Space',
           tabBarIcon: ({ color, size }) => (
-            <Feather name="play" size={24} color={color} />
+            <Feather name="zap" size={24} color={color} />
           ),
         }}
       />
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="teams"
         options={{
           title: 'Teams',
@@ -50,7 +50,7 @@ export default function TabLayout() {
             <Feather name="users" size={24} color={color} />
           ),
         }}
-      />
+      /> */}
       <Tabs.Screen
         name="profile"
         options={{
