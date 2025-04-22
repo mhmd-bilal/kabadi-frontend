@@ -13,12 +13,48 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import storageHelper, { Team, Match, Ground } from '../storageHelper'; // Import from storageHelper
+import {
+  GoogleSignin,
+  isErrorWithCode,
+  isSuccessResponse,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
 
 export default function HomePage() {
   const [teams, setTeams] = useState<Team[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
   const [grounds, setGrounds] = useState<Ground[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const signIn = async () => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      const response = await GoogleSignin.signIn();
+      if (isSuccessResponse(response)) {
+        console.log('Success');
+        // setState({ userInfo: response.data });
+      } else {
+        console.log('FAILED');
+        // sign in was cancelled by user
+      }
+    } catch (error) {
+      console.log('error:', error);
+      if (isErrorWithCode(error)) {
+        switch (error.code) {
+          case statusCodes.IN_PROGRESS:
+            // operation (eg. sign in) already in progress
+            break;
+          case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
+            // Android only, play services not available or outdated
+            break;
+          default:
+          // some other error happened
+        }
+      } else {
+        // an error that's not related to google sign in occurred
+      }
+    }
+  };
 
   useEffect(() => {
     loadData();
@@ -46,7 +82,7 @@ export default function HomePage() {
     const loadedTeams = await storageHelper.getTeams();
     const loadedMatches = await storageHelper.getMatches();
     const loadedGrounds = await storageHelper.getGrounds();
-    
+
     setTeams(loadedTeams);
     setMatches(loadedMatches);
     setGrounds(loadedGrounds);
@@ -66,6 +102,7 @@ export default function HomePage() {
           />
           <View className="absolute bottom-10 left-6 w-64">
             <Text className="font-regular text-4xl text-[#f7f2f1]">Ka-Baddie</Text>
+            <TouchableOpacity onPress={signIn}>Continue with Google</TouchableOpacity>
           </View>
         </ImageBackground>
       </View>
@@ -95,10 +132,9 @@ export default function HomePage() {
               return (
                 <TouchableOpacity
                   key={match.id}
-                  onPress={() => router.push({pathname: '/match/[id]', params: {id: match.id}})}
+                  onPress={() => router.push({ pathname: '/match/[id]', params: { id: match.id } })}
                   activeOpacity={0.7}>
-                  <View
-                    className="relative mb-4 mr-2 min-w-64 rounded-md border border-gray-200 bg-white p-4 pb-10 shadow-md">
+                  <View className="relative mb-4 mr-2 min-w-64 rounded-md border border-gray-200 bg-white p-4 pb-10 shadow-md">
                     {/* Teams and Scores */}
                     <View className="flex-row items-center justify-between">
                       {/* Home Team */}
@@ -112,7 +148,9 @@ export default function HomePage() {
                       </View>
 
                       {/* VS divider */}
-                      <Text className="font-regular text-lg text-gray-500">{match.result ? 'vs' : ''}</Text>
+                      <Text className="font-regular text-lg text-gray-500">
+                        {match.result ? 'vs`' : ''}
+                      </Text>
 
                       {/* Away Team */}
                       <View className="items-end">
@@ -160,25 +198,28 @@ export default function HomePage() {
             {grounds.map((ground) => (
               <TouchableOpacity
                 key={ground.id}
-                onPress={() => router.push({pathname: '/ground/[id]', params: {id: ground.id}})}
+                onPress={() => router.push({ pathname: '/ground/[id]', params: { id: ground.id } })}
                 activeOpacity={0.7}>
-                <View
-                  className="relative mb-4 mr-2 w-64 overflow-hidden rounded-md border border-gray-200 bg-white shadow-lg">
+                <View className="relative mb-4 mr-2 w-64 overflow-hidden rounded-md border border-gray-200 bg-white shadow-lg">
                   {/* Ground Image */}
-                  <Image 
-                    source={{ uri: ground.photos[0] }} 
-                    className="h-32 w-full" 
-                    resizeMode="cover" 
+                  <Image
+                    source={{ uri: ground.photos[0] }}
+                    className="h-32 w-full"
+                    resizeMode="cover"
                   />
 
                   {/* Status Badge */}
                   <View
                     className={`absolute right-2 top-2 rounded-full px-3 py-1 ${
-                      ground.status === 'open' ? 'bg-[#16aa3e]' : 
-                      ground.status === 'closed' ? 'bg-[#aa1d16]' : 
-                      'bg-[#aa9416]'
+                      ground.status === 'open'
+                        ? 'bg-[#16aa3e]'
+                        : ground.status === 'closed'
+                          ? 'bg-[#aa1d16]'
+                          : 'bg-[#aa9416]'
                     }`}>
-                    <Text className="font-regular text-xs uppercase text-white">{ground.status}</Text>
+                    <Text className="font-regular text-xs uppercase text-white">
+                      {ground.status}
+                    </Text>
                   </View>
 
                   {/* Info Section */}
