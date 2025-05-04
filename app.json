@@ -16,9 +16,6 @@
         {
           "launchMode": "most-recent"
         }
-      ],
-      [
-        "@react-native-google-signin/google-signin"
       ]
     ],
     "fonts": [

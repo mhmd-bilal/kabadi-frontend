@@ -10,6 +10,9 @@ export interface Team {
   name: string;
   city: string;
   players: Player[];
+  inviteCode?: string;
+  description?: string;
+  createdBy?: string;
 }
 
 export interface MatchResult {
@@ -29,6 +32,22 @@ export interface Match {
   startTime: string; // ISO string format
   status: 'scheduled' | 'in-progress' | 'completed';
   result: MatchResult | null;
+}
+
+export interface Tournament {
+  id: string;
+  name: string;
+  description?: string;
+  location: string;
+  startDate: string;
+  endDate: string;
+  status: 'upcoming' | 'ongoing' | 'completed';
+  teams: string[]; // Team IDs
+  matches: string[]; // Match IDs
+  inviteCode: string;
+  createdBy?: string;
+  prize?: string;
+  rules?: string[];
 }
 
 export interface Ground {
@@ -65,13 +84,49 @@ const dummyTeams: Team[] = [
     id: 't1',
     name: 'Thunderbolts',
     city: 'Mumbai',
-    players: dummyPlayers
+    players: dummyPlayers,
+    inviteCode: 'TBOLT123'
   },
   {
     id: 't2',
     name: 'Desert Storm',
     city: 'Jaipur',
-    players: dummyPlayers
+    players: dummyPlayers,
+    inviteCode: 'DSTRM456'
+  }
+];
+
+const dummyTournaments: Tournament[] = [
+  {
+    id: 'trn1',
+    name: 'Mumbai Summer League',
+    description: 'Annual summer kabaddi tournament in Mumbai',
+    location: 'Mumbai Arena',
+    startDate: new Date(2023, 5, 1).toISOString(),
+    endDate: new Date(2023, 5, 15).toISOString(),
+    status: 'ongoing',
+    teams: ['t1', 't2'],
+    matches: ['m1', 'm2', 'm3'],
+    inviteCode: 'MSL2023',
+    prize: '₹100,000'
+  },
+  {
+    id: 'trn2',
+    name: 'National Kabaddi Championship',
+    description: 'Prestigious national level tournament',
+    location: 'Delhi Stadium',
+    startDate: new Date(2023, 7, 10).toISOString(),
+    endDate: new Date(2023, 7, 25).toISOString(),
+    status: 'upcoming',
+    teams: [],
+    matches: [],
+    inviteCode: 'NKC2023',
+    prize: '₹500,000',
+    rules: [
+      'Each team must have 10-12 players',
+      'International rules apply',
+      'Match duration: 40 minutes'
+    ]
   }
 ];
 
@@ -232,6 +287,76 @@ const dataHelper = {
     if (index !== -1) {
       dummyMatches.splice(index, 1);
     }
+  },
+
+  // Tournament related functions
+  getTournaments: async (): Promise<Tournament[]> => {
+    return dummyTournaments;
+  },
+
+  getTournamentById: async (id: string): Promise<Tournament | undefined> => {
+    return dummyTournaments.find(tournament => tournament.id === id);
+  },
+
+  saveTournament: async (tournament: Tournament): Promise<void> => {
+    const index = dummyTournaments.findIndex(t => t.id === tournament.id);
+    if (index !== -1) {
+      // Update existing tournament
+      dummyTournaments[index] = tournament;
+    } else {
+      // Add new tournament
+      dummyTournaments.push(tournament);
+    }
+  },
+
+  deleteTournament: async (id: string): Promise<void> => {
+    const index = dummyTournaments.findIndex(tournament => tournament.id === id);
+    if (index !== -1) {
+      dummyTournaments.splice(index, 1);
+    }
+  },
+
+  // Function to verify and join a tournament using invite code
+  joinTournamentByCode: async (inviteCode: string, teamId: string): Promise<Tournament | null> => {
+    const tournament = dummyTournaments.find(t => t.inviteCode === inviteCode);
+    if (tournament && !tournament.teams.includes(teamId)) {
+      tournament.teams.push(teamId);
+      return tournament;
+    }
+    return null;
+  },
+
+  // Team related functions
+  saveTeam: async (team: Team): Promise<void> => {
+    const index = dummyTeams.findIndex(t => t.id === team.id);
+    if (index !== -1) {
+      // Update existing team
+      dummyTeams[index] = team;
+    } else {
+      // Add new team
+      dummyTeams.push(team);
+    }
+  },
+
+  // Function to verify and join a team using invite code
+  joinTeamByCode: async (inviteCode: string, playerId: string): Promise<Team | null> => {
+    const team = dummyTeams.find(t => t.inviteCode === inviteCode);
+    if (team && !team.players.some(p => p.id === playerId)) {
+      const player = { id: playerId, name: "New Player", number: String(team.players.length + 1) };
+      team.players.push(player);
+      return team;
+    }
+    return null;
+  },
+
+  // Generate a unique invitation code
+  generateInviteCode: (prefix: string): string => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = prefix.toUpperCase().substring(0, 4);
+    for (let i = 0; i < 4; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code;
   },
 
   // Get all grounds

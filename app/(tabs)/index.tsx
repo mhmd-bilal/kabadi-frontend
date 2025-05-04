@@ -9,52 +9,16 @@ import {
   Image,
   ScrollView,
   ImageBackground,
-  StyleSheet,
   TouchableOpacity,
 } from 'react-native';
+
 import storageHelper, { Team, Match, Ground } from '../storageHelper'; // Import from storageHelper
-import {
-  GoogleSignin,
-  isErrorWithCode,
-  isSuccessResponse,
-  statusCodes,
-} from '@react-native-google-signin/google-signin';
 
 export default function HomePage() {
   const [teams, setTeams] = useState<Team[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
   const [grounds, setGrounds] = useState<Ground[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const signIn = async () => {
-    try {
-      await GoogleSignin.hasPlayServices();
-      const response = await GoogleSignin.signIn();
-      if (isSuccessResponse(response)) {
-        console.log('Success');
-        // setState({ userInfo: response.data });
-      } else {
-        console.log('FAILED');
-        // sign in was cancelled by user
-      }
-    } catch (error) {
-      console.log('error:', error);
-      if (isErrorWithCode(error)) {
-        switch (error.code) {
-          case statusCodes.IN_PROGRESS:
-            // operation (eg. sign in) already in progress
-            break;
-          case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
-            // Android only, play services not available or outdated
-            break;
-          default:
-          // some other error happened
-        }
-      } else {
-        // an error that's not related to google sign in occurred
-      }
-    }
-  };
 
   useEffect(() => {
     loadData();
@@ -102,7 +66,7 @@ export default function HomePage() {
           />
           <View className="absolute bottom-10 left-6 w-64">
             <Text className="font-regular text-4xl text-[#f7f2f1]">Ka-Baddie</Text>
-            <TouchableOpacity onPress={signIn}>Continue with Google</TouchableOpacity>
+            {/* <TouchableOpacity>Continue with Google</TouchableOpacity> */}
           </View>
         </ImageBackground>
       </View>
